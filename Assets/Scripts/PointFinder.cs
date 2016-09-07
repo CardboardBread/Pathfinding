@@ -12,11 +12,11 @@ public class PointFinder : MonoBehaviour
         float xpos = transform.position.x + mapLocation.fieldLength / 2 - 0.5f;
         float ypos = transform.position.y + mapLocation.fieldHeight / 2 - 0.5f;
         float heuristic = mapLocation.nodeHeuristic[(int)xpos, (int)ypos];
-        for (int i = 0; i == heuristic; i++)
+        if (heuristic != 0f)
         {
-            transform.position = nextMove(transform.position);
+            Vector2 destination = nextMove(new Vector2(xpos, ypos));
+            Instantiate(gameObject, destination, Quaternion.identity, transform.parent.transform);
         }
-
     }
 
     Vector2 nextMove (Vector2 position)

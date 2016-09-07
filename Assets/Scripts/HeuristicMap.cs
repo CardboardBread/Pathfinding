@@ -15,9 +15,9 @@ public class HeuristicMap : MonoBehaviour
     private bool incrementSwap;
     public GameObject nodeContainer;
     public GameObject pathfinder;
-    private float number;
-    private bool pathing;
     public string containerTag;
+    private int iteration;
+    private Vector2 pathStart;
 
     void Start()
     {
@@ -31,31 +31,37 @@ public class HeuristicMap : MonoBehaviour
     {
         if (Input.GetButtonDown(actionbutton))
         {
+            clearBoard();
             destination = new Vector2(((int)(Random.Range(0, fieldLength / 2) - fieldLength / 2)), (int)(Random.Range(0, fieldHeight) - fieldHeight / 2));
+        }
+        if (Input.GetButtonUp(actionbutton))
+        {
             Debug.Log("Pathfinding to " + destination);
+            Instantiate(nodeContainer, new Vector3(0, 0, -10), Quaternion.identity);
             generateHeuristic();
         }
     }
 
     void clearBoard ()
     {
-        Transform parent = GameObject.FindWithTag(containerTag).transform;
-        if (parent != null)
+        if (GameObject.FindWithTag(containerTag) != null)
         {
+            Transform parent = GameObject.FindWithTag(containerTag).transform;
             foreach (Transform child in parent)
             {
-                Destroy(child);
+                foreach (Transform secChild in child)
+                {
+                    Destroy(secChild.gameObject);
+                }
+                Destroy(child.gameObject);
             }
-            Destroy(parent);
+            Destroy(parent.gameObject);
         }
     }
 
     void generateHeuristic()
     {
-        clearBoard();
-        pathing = false;
-        Instantiate(nodeContainer, new Vector3(0, 0, -10), Quaternion.identity);
-        number = 0;
+        pathStart = new Vector2(Random.Range(1f, fieldLength), Random.Range(1f, fieldHeight));
         for (int x = 0; x < fieldLength; x++)
         {
             for (int y = 0; y < fieldHeight; y++)
@@ -76,16 +82,19 @@ public class HeuristicMap : MonoBehaviour
     {
         Vector2 gridLocation;
         Vector3 position;
-        if (pathing != true) { number += Random.Range(0.1f, 1f); }
+        Transform parent = GameObject.FindWithTag(containerTag).transform;
         gridLocation = new Vector2(x - fieldLength / 2, y - fieldHeight / 2);
         nodeHeuristic[(int)x, (int)y] = getHeuristic(gridLocation, destination);
         position = new Vector3(x - fieldLength / 2 + 0.5f, y - fieldHeight / 2 + 0.5f, -1);
-        Instantiate(space, position, Quaternion.identity, nodeContainer.transform);
-        if (number > 12f)
+        Instantiate(space, position, Quaternion.identity, parent);
+        if ((int)pathStart.x == x && (int)pathStart.y == y)
         {
-            Instantiate(pathfinder, position + new Vector3(0, 0, -10), Quaternion.identity, nodeContainer.transform);
-            pathing = true;
-            number = 0;
+            pathFind(position + new Vector3(0, 0, -10), Quaternion.identity, parent);
         }
+    }
+
+    public void pathFind (Vector3 position, Quaternion rotation, Transform parent)
+    {
+        Instantiate(pathfinder, position, rotation, parent);
     }
 }

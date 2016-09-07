@@ -14,6 +14,10 @@ public class HeuristicMap : MonoBehaviour
     private float heightIncrement;
     private bool incrementSwap;
     public GameObject nodeContainer;
+    public GameObject pathfinder;
+    private float number;
+    private bool pathing;
+    public string containerTag;
 
     void Start()
     {
@@ -21,7 +25,6 @@ public class HeuristicMap : MonoBehaviour
         fieldHeight = field.transform.localScale.y + field.transform.position.y;
         destination = new Vector2(((int)(Random.Range(0, fieldLength / 2) - fieldLength / 2)), (int)(Random.Range(0, fieldHeight) - fieldHeight / 2));
         nodeHeuristic = new float[(int)field.transform.localScale.x, (int)field.transform.localScale.y];
-        generateHeuristic();
     }
 
     public void Update()
@@ -36,13 +39,23 @@ public class HeuristicMap : MonoBehaviour
 
     void clearBoard ()
     {
-        Destroy(GameObject.Find("Node Container(Clone)"));
+        Transform parent = GameObject.FindWithTag(containerTag).transform;
+        if (parent != null)
+        {
+            foreach (Transform child in parent)
+            {
+                Destroy(child);
+            }
+            Destroy(parent);
+        }
     }
 
     void generateHeuristic()
     {
         clearBoard();
+        pathing = false;
         Instantiate(nodeContainer, new Vector3(0, 0, -10), Quaternion.identity);
+        number = 0;
         for (int x = 0; x < fieldLength; x++)
         {
             for (int y = 0; y < fieldHeight; y++)
@@ -63,9 +76,16 @@ public class HeuristicMap : MonoBehaviour
     {
         Vector2 gridLocation;
         Vector3 position;
+        if (pathing != true) { number += Random.Range(0.1f, 1f); }
         gridLocation = new Vector2(x - fieldLength / 2, y - fieldHeight / 2);
         nodeHeuristic[(int)x, (int)y] = getHeuristic(gridLocation, destination);
         position = new Vector3(x - fieldLength / 2 + 0.5f, y - fieldHeight / 2 + 0.5f, -1);
         Instantiate(space, position, Quaternion.identity, nodeContainer.transform);
+        if (number > 12f)
+        {
+            Instantiate(pathfinder, position + new Vector3(0, 0, -10), Quaternion.identity, nodeContainer.transform);
+            pathing = true;
+            number = 0;
+        }
     }
 }

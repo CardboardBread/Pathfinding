@@ -15,6 +15,11 @@ public class SpaceHandler : MonoBehaviour
         float ypos = transform.position.y + mapLocation.fieldHeight / 2 - 0.5f;
         float heuristic = mapLocation.nodeHeuristic[(int)xpos, (int)ypos];
         label.text = heuristic.ToString();
-        label.color = new Color(heuristic /  10, 0, 0);
+        label.color = new Color(heuristic / 10, 0, 0);
+    }
+
+    public void pathFind()
+    {
+        mapLocation.pathFind(transform.localPosition + new Vector3(0, 0, -4), transform.parent);
     }
 }

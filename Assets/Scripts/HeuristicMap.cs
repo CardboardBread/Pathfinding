@@ -18,6 +18,8 @@ public class HeuristicMap : MonoBehaviour
     public string containerTag;
     private int iteration;
     private Vector2 pathStart;
+    private float containerLayer;
+    private float spaceLayer;
 
     void Start()
     {
@@ -25,6 +27,8 @@ public class HeuristicMap : MonoBehaviour
         fieldHeight = field.transform.localScale.y + field.transform.position.y;
         destination = new Vector2(((int)(Random.Range(0, fieldLength / 2) - fieldLength / 2)), (int)(Random.Range(0, fieldHeight) - fieldHeight / 2));
         nodeHeuristic = new float[(int)field.transform.localScale.x, (int)field.transform.localScale.y];
+        containerLayer = 0;
+        spaceLayer = -1;
     }
 
     public void Update()
@@ -37,7 +41,7 @@ public class HeuristicMap : MonoBehaviour
         if (Input.GetButtonUp(actionbutton))
         {
             Debug.Log("Pathfinding to " + destination);
-            Instantiate(nodeContainer, new Vector3(0, 0, -10), Quaternion.identity);
+            Instantiate(nodeContainer, new Vector3(0, 0, containerLayer), Quaternion.identity);
             generateHeuristic();
         }
     }
@@ -61,7 +65,6 @@ public class HeuristicMap : MonoBehaviour
 
     void generateHeuristic()
     {
-        pathStart = new Vector2(Random.Range(1f, fieldLength), Random.Range(1f, fieldHeight));
         for (int x = 0; x < fieldLength; x++)
         {
             for (int y = 0; y < fieldHeight; y++)
@@ -85,16 +88,12 @@ public class HeuristicMap : MonoBehaviour
         Transform parent = GameObject.FindWithTag(containerTag).transform;
         gridLocation = new Vector2(x - fieldLength / 2, y - fieldHeight / 2);
         nodeHeuristic[(int)x, (int)y] = getHeuristic(gridLocation, destination);
-        position = new Vector3(x - fieldLength / 2 + 0.5f, y - fieldHeight / 2 + 0.5f, -1);
+        position = new Vector3(x - fieldLength / 2 + 0.5f, y - fieldHeight / 2 + 0.5f, spaceLayer);
         Instantiate(space, position, Quaternion.identity, parent);
-        if ((int)pathStart.x == x && (int)pathStart.y == y)
-        {
-            pathFind(position + new Vector3(0, 0, -10), Quaternion.identity, parent);
-        }
     }
 
-    public void pathFind (Vector3 position, Quaternion rotation, Transform parent)
+    public void pathFind (Vector3 position, Transform parent)
     {
-        Instantiate(pathfinder, position, rotation, parent);
+        Instantiate(pathfinder, position, Quaternion.identity, parent);
     }
 }

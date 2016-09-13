@@ -5,57 +5,41 @@ public class PointFinder : MonoBehaviour
 {
     private HeuristicMap mapLocation;
     private Vector2[] path;
+    private Vector2 heuristicPos;
 
     public void OnEnable()
     {
         mapLocation = GameObject.Find("Main Camera").GetComponent<HeuristicMap>();
-        float xpos = transform.position.x + mapLocation.fieldLength / 2 - 0.5f;
-        float ypos = transform.position.y + mapLocation.fieldHeight / 2 - 0.5f;
+        float xpos = transform.localPosition.x + mapLocation.fieldLength / 2;
+        float ypos = transform.localPosition.y + mapLocation.fieldHeight / 2;
         float heuristic = mapLocation.nodeHeuristic[(int)xpos, (int)ypos];
         if (heuristic != 0f)
         {
-            //Vector2 destination = nextMove(new Vector2(xpos, ypos));
-            //Instantiate(gameObject, destination, Quaternion.identity, transform.parent.transform);
+            Vector2 destination = nextMove((int)xpos, (int)ypos);
+            mapLocation.pathFind(destination, transform.parent.transform);
         }
     }
 
-    Vector2 nextMove (Vector2 position)
+    Vector2 nextMove (int x, int y)
     {
-        float moveCost = 10f;
-        float upCost = mapLocation.nodeHeuristic[(int)position.x, (int)position.y + 1] * moveCost;
-        float downCost = mapLocation.nodeHeuristic[(int)position.x, (int)position.y - 1] * moveCost;
-        float leftCost = mapLocation.nodeHeuristic[(int)position.x + 1, (int)position.y] * moveCost;
-        float rightCost = mapLocation.nodeHeuristic[(int)position.x - 1, (int)position.y] * moveCost;
-        float[] costs = new float[] { upCost, downCost, leftCost, rightCost };
-        float lowest = upCost;
-        int move = 0;
-        for (int i = 1; i == 4; i ++)
+        float index = Mathf.Infinity;
+        Vector2 pos = Vector2.zero;
+        if (x > 0)
         {
-            if (costs[i] < lowest)
-            {
-                lowest = costs[i];
-                move = i;
-            }
+            if (mapLocation.nodeHeuristic[x - 1, y] < index) { index = mapLocation.nodeHeuristic[x - 1, y]; pos = new Vector2(x - 1, y); }
         }
-        if (move == 1)
+        if (x < mapLocation.fieldLength / 2)
         {
-            return new Vector2(position.x, position.y + 1);
+            if (mapLocation.nodeHeuristic[x + 1, y] < index) { index = mapLocation.nodeHeuristic[x + 1, y]; pos = new Vector2(x + 1, y); }
         }
-        else if (move == 2)
+        if (y > 0)
         {
-            return new Vector2(position.x, position.y - 1);
+            if (mapLocation.nodeHeuristic[x, y - 1] < index) { index = mapLocation.nodeHeuristic[x, y - 1]; pos = new Vector2(x, y - 1); }
         }
-        else if (move == 3)
+        if (y < mapLocation.fieldHeight / 2)
         {
-            return new Vector2(position.x + 1, position.y);
+            if (mapLocation.nodeHeuristic[x, y + 1] < index) { index = mapLocation.nodeHeuristic[x, y + 1]; pos = new Vector2(x, y + 1); }
         }
-        else if (move == 4)
-        {
-            return new Vector2(position.x - 1, position.y);
-        }
-        else
-        {
-            return position;
-        }
+        return pos - new Vector2(mapLocation.fieldLength / 2, mapLocation.fieldHeight / 2);
     }
 }

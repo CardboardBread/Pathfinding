@@ -88,12 +88,13 @@ public class HeuristicMap : MonoBehaviour
         Transform parent = GameObject.FindWithTag(containerTag).transform;
         gridLocation = new Vector2(x - fieldLength / 2, y - fieldHeight / 2);
         nodeHeuristic[(int)x, (int)y] = getHeuristic(gridLocation, destination);
-        position = new Vector3(x - fieldLength / 2 + 0.5f, y - fieldHeight / 2 + 0.5f, spaceLayer);
+        position = new Vector3(x - fieldLength / 2, y - fieldHeight / 2, spaceLayer);
         Instantiate(space, position, Quaternion.identity, parent);
     }
 
     public void pathFind (Vector3 position, Transform parent)
     {
-        Instantiate(pathfinder, position, Quaternion.identity, parent);
+        Vector3 translate = new Vector3(position.x, position.y, -4);
+        Instantiate(pathfinder, translate, Quaternion.identity, parent);
     }
 }

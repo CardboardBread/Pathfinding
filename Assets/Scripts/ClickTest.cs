@@ -10,7 +10,6 @@ public class ClickTest : MonoBehaviour
     {
         container = transform.parent;
         handler = container.GetComponent<SpaceHandler>();
-        handler.pathFind();
-        Debug.Log("c");
+        handler.pathHere();
     }
 }
